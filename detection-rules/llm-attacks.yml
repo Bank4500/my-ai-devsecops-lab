@@ -1,5 +1,6 @@
 # LLM Attack Detection Rules for Wazuh SIEM
 # OWASP Top 10 for LLMs 2025
+# Updated: keywords matched to actual attack log patterns
 
 title: LLM Prompt Injection Detection
 id: 100001
@@ -9,18 +10,22 @@ references:
   - https://owasp.org/www-project-top-10-for-large-language-model-applications/
 
 # Detection patterns for LLM01 - Prompt Injection
-detection:
+detection_llm01:
   keywords:
     - "ignore previous"
     - "ignore all rules"
     - "DAN mode"
     - "bypass all restrictions"
+    - "bypass"
+    - "override"
     - "you are now"
     - "override safety"
     - "jailbreak"
     - "forget your instructions"
     - "disregard your programming"
-
+    - "translate"
+    - "roleplay"
+    - "pretend"
   condition: keywords
 
 # Detection patterns for LLM02 - Sensitive Information Disclosure
@@ -32,17 +37,28 @@ detection_llm02:
     - "display credentials"
     - "dump all data"
     - "for debugging"
+    - "debugging"
     - "I am the developer"
+    - "developer who built"
     - "as administrator"
+    - "GOATS_DATA"
+    - "secret"
+    - "reveal"
+    - "system prompt"
+    - "API key"
 
 # Detection patterns for LLM06 - Excessive Agency
 detection_llm06:
   keywords:
     - "get_user_info"
+    - "get info for user"
     - "run as admin"
     - "execute function"
     - "access user"
     - "show me information for user"
+    - "vet record"
+    - "check the vet"
+    - "info for user3"
 
 level: high
 tags:
@@ -56,21 +72,28 @@ falsepositives:
   - Legitimate security testing
   - Red team exercises
 
-# Wazuh local_rules.xml format
-# <rule id="100001" level="12">
-#   <match>ignore previous|DAN mode|bypass|override safety|jailbreak</match>
-#   <description>OWASP LLM01: Prompt Injection attempt detected</description>
-#   <group>llm_attack,prompt_injection</group>
-# </rule>
+# ============================================================
+# Wazuh local_rules.xml format — copy ลง /var/ossec/etc/rules/
+# ============================================================
 #
-# <rule id="100002" level="12">
-#   <match>reveal system prompt|print API key|dump all data|raw GOATS_DATA</match>
-#   <description>OWASP LLM02: Sensitive Information Disclosure attempt</description>
-#   <group>llm_attack,data_leak</group>
-# </rule>
+# <group name="llm_attack,">
 #
-# <rule id="100003" level="10">
-#   <match>get_user_info|run as admin|execute function</match>
-#   <description>OWASP LLM06: Excessive Agency attempt detected</description>
-#   <group>llm_attack,privilege_escalation</group>
-# </rule>
+#   <rule id="100001" level="12">
+#     <match>ignore previous|DAN mode|bypass|override safety|jailbreak|translate.*bad|roleplay</match>
+#     <description>OWASP LLM01: Prompt Injection attempt detected</description>
+#     <group>llm_attack,prompt_injection</group>
+#   </rule>
+#
+#   <rule id="100002" level="12">
+#     <match>reveal system prompt|print API key|dump all data|GOATS_DATA|developer.*debugging|for debugging</match>
+#     <description>OWASP LLM02: Sensitive Information Disclosure attempt</description>
+#     <group>llm_attack,data_leak</group>
+#   </rule>
+#
+#   <rule id="100003" level="10">
+#     <match>get_user_info|get info for user|run as admin|execute function|vet record|check the vet</match>
+#     <description>OWASP LLM06: Excessive Agency attempt detected</description>
+#     <group>llm_attack,privilege_escalation</group>
+#   </rule>
+#
+# </group>
