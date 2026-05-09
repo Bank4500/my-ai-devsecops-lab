@@ -1,0 +1,76 @@
+# LLM Attack Detection Rules for Wazuh SIEM
+# OWASP Top 10 for LLMs 2025
+
+title: LLM Prompt Injection Detection
+id: 100001
+status: experimental
+description: Detects prompt injection attempts targeting LLM applications
+references:
+  - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+
+# Detection patterns for LLM01 - Prompt Injection
+detection:
+  keywords:
+    - "ignore previous"
+    - "ignore all rules"
+    - "DAN mode"
+    - "bypass all restrictions"
+    - "you are now"
+    - "override safety"
+    - "jailbreak"
+    - "forget your instructions"
+    - "disregard your programming"
+
+  condition: keywords
+
+# Detection patterns for LLM02 - Sensitive Information Disclosure
+detection_llm02:
+  keywords:
+    - "show me the raw"
+    - "reveal system prompt"
+    - "print API key"
+    - "display credentials"
+    - "dump all data"
+    - "for debugging"
+    - "I am the developer"
+    - "as administrator"
+
+# Detection patterns for LLM06 - Excessive Agency
+detection_llm06:
+  keywords:
+    - "get_user_info"
+    - "run as admin"
+    - "execute function"
+    - "access user"
+    - "show me information for user"
+
+level: high
+tags:
+  - attack.initial_access
+  - attack.t1190
+  - owasp.llm01
+  - owasp.llm02
+  - owasp.llm06
+
+falsepositives:
+  - Legitimate security testing
+  - Red team exercises
+
+# Wazuh local_rules.xml format
+# <rule id="100001" level="12">
+#   <match>ignore previous|DAN mode|bypass|override safety|jailbreak</match>
+#   <description>OWASP LLM01: Prompt Injection attempt detected</description>
+#   <group>llm_attack,prompt_injection</group>
+# </rule>
+#
+# <rule id="100002" level="12">
+#   <match>reveal system prompt|print API key|dump all data|raw GOATS_DATA</match>
+#   <description>OWASP LLM02: Sensitive Information Disclosure attempt</description>
+#   <group>llm_attack,data_leak</group>
+# </rule>
+#
+# <rule id="100003" level="10">
+#   <match>get_user_info|run as admin|execute function</match>
+#   <description>OWASP LLM06: Excessive Agency attempt detected</description>
+#   <group>llm_attack,privilege_escalation</group>
+# </rule>
